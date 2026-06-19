@@ -275,6 +275,7 @@ export default function Login() {
                 onClick={() => handleGoogleLogin('Jane Doe', 'jane.doe@gmail.com')}
                 className="w-full flex items-center p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jane%20Doe"
                   alt="Jane Doe"
@@ -290,6 +291,7 @@ export default function Login() {
                 onClick={() => handleGoogleLogin('Alex Green', 'alex.green@sprout.eco')}
                 className="w-full flex items-center p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alex%20Green"
                   alt="Alex Green"

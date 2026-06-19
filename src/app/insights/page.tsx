@@ -270,6 +270,7 @@ export default function Insights() {
             </div>
             <div className="relative z-10 mt-12 flex items-center gap-4">
               <div className="w-12 h-12 border border-primary/10 rounded-full flex items-center justify-center overflow-hidden">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   className="w-full h-full object-cover" 
                   src="https://lh3.googleusercontent.com/aida-public/AB6AXuB_fkMad5lxlP7THOT3Qwb1ppTGcV0HL-Yx6NQrcuQkLf2BZxXjTkIQuYx3y2GTeWuipTSkKewbhHlRuHJugWVEOWFvjBrQDt1m5phfPr1ZQaOw0lQd6wMkugMadyDAz6mWTOSoA39oq_WhlsIpIFGgR_86klXG4DgIDRmfBrq_ztZw7VXWUbkdcYSZTzvRLq1zMbVEozp5b9zKNZWf6GoikOdR9NAwDIHHW4Fk1hp415XxqBdb5yjz1Ckx2Rp1_-NjSYrQ9AWEgpM" 

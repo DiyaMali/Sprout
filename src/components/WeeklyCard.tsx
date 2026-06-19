@@ -109,7 +109,12 @@ export function WeeklyCard({ state }: { state: WeeklyState }) {
       
       {imgUrl ? (
         <div className="rounded-2xl overflow-hidden shadow-lg border border-primary/10 max-w-sm w-full">
-          <img src={imgUrl} alt="Weekly Sprout Card" className="w-full h-auto" />
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img 
+            src={imgUrl} 
+            alt="Weekly Sprout Card" 
+            className="w-full h-auto" 
+          />
         </div>
       ) : (
         <div className="w-64 h-80 bg-surface-variant/30 rounded-2xl animate-pulse"></div>

@@ -46,6 +46,7 @@ export function Navigation() {
                 className="flex items-center gap-2 px-3 py-1.5 rounded-full hover:bg-black/5 transition-colors text-sm font-medium text-primary"
               >
                 {user.avatar ? (
+                  // eslint-disable-next-line @next/next/no-img-element
                   <img 
                     src={user.avatar} 
                     alt={user.name} 

@@ -1,6 +1,9 @@
 {
   "name": "sprout",
-  "version": "0.1.0",
+  "version": "1.0.0",
+  "description": "A warm, poetic, and highly knowledgeable environmental digital eco-coach that helps users track, visualize, and build sustainable habits.",
+  "author": "Diya Mali",
+  "license": "MIT",
   "private": true,
   "scripts": {
     "dev": "next dev",
