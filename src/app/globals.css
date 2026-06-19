@@ -1,26 +1,86 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+@theme {
+  --color-primary: #000000;
+  --color-on-primary: #ffffff;
+  --color-secondary: #5e5e5e;
+  --color-on-secondary: #ffffff;
+  --color-tertiary: #000000;
+  --color-on-tertiary: #ffffff;
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-background: #f9f9f9;
+  --color-on-background: #1b1b1b;
+  --color-surface: #f9f9f9;
+  --color-on-surface: #1b1b1b;
+  --color-outline: #7e7576;
+  --color-surface-variant: #e2e2e2;
+  --color-on-surface-variant: #4c4546;
+  --color-aethera-gray: #6F6F6F;
+
+  --font-display: "Instrument Serif", serif;
+  --font-body: "Inter", sans-serif;
+
+  --spacing-gutter: 24px;
+  --spacing-unit: 8px;
+  --spacing-container-max: 1440px;
+  --spacing-margin-mobile: 20px;
+  --spacing-margin-desktop: 64px;
+
+  --animate-fade-rise: fadeRise 0.8s ease-out forwards;
+  --animate-fade-rise-delayed: fadeRise 0.8s ease-out 0.2s forwards;
+  --animate-fade-rise-delayed-2: fadeRise 0.8s ease-out 0.4s forwards;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+@keyframes fadeRise {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+@layer base {
+  body {
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -ms-overflow-style: none; /* IE and Edge */
+    scrollbar-width: none; /* Firefox */
+  }
+
+  body::-webkit-scrollbar {
+    display: none;
+  }
+  
+  .font-display {
+    font-family: var(--font-display);
+  }
+}
+
+@layer utilities {
+  .nav-blur {
+    backdrop-filter: blur(40px);
+    -webkit-backdrop-filter: blur(40px);
+  }
+
+  .video-container {
+    position: absolute;
+    inset: 300px 0 0 0;
+    overflow: hidden;
+    z-index: 0;
+  }
+
+  video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+  }
+
+  .fade-in { opacity: 1 !important; }
+  .fade-out { opacity: 0 !important; }
 }

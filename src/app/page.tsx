@@ -1,65 +1,90 @@
-import Image from "next/image";
+"use client";
+
+import { useEffect, useRef } from 'react';
+import { useRouter } from 'next/navigation';
 
 export default function Home() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const router = useRouter();
+  
+
+
+  useEffect(() => {
+    const video = videoRef.current;
+    const fadeDuration = 0.5; // in seconds
+
+    if (!video) return;
+
+    const handlePlaying = () => {
+      video.classList.add('fade-in');
+    };
+
+    const handleTimeUpdate = () => {
+      const timeLeft = video.duration - video.currentTime;
+      if (timeLeft <= fadeDuration && !video.classList.contains('fade-out')) {
+        video.classList.remove('fade-in');
+        video.classList.add('fade-out');
+      }
+    };
+
+    const handleEnded = () => {
+      video.currentTime = 0;
+      video.classList.remove('fade-out');
+      video.play().catch(e => console.log('Autoplay blocked', e));
+    };
+
+    video.play().catch(e => console.log('Autoplay blocked, waiting for interaction'));
+    
+    video.addEventListener('playing', handlePlaying);
+    video.addEventListener('timeupdate', handleTimeUpdate);
+    video.addEventListener('ended', handleEnded);
+
+    return () => {
+      video.removeEventListener('playing', handlePlaying);
+      video.removeEventListener('timeupdate', handleTimeUpdate);
+      video.removeEventListener('ended', handleEnded);
+    };
+  }, []);
+
+  const scrollToApp = () => {
+    router.push('/journey');
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <>
+      {/* Video Background Container */}
+      <div className="video-container">
+        <video ref={videoRef} muted playsInline preload="auto">
+          <source src="https://d8j0ntlcm91z4.cloudfront.net/user_38xzZboKViGWJOttwIXH07lWA1P/hf_20260328_083109_283f3553-e28f-428b-a723-d639c617eb2b.mp4" type="video/mp4" />
+        </video>
+      </div>
+
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-gradient-to-b from-white via-transparent to-white pointer-events-none z-10" />
+
+      {/* Hero Content */}
+      <section className="relative z-20 flex flex-col items-center justify-start text-center pt-[calc(8rem-75px)] pb-40 px-margin-mobile md:px-margin-desktop min-h-[90vh]">
+        <div className="max-w-6xl mx-auto flex flex-col items-center">
+          {/* Headline */}
+          <h1 className="animate-fade-rise font-display text-7xl md:text-[128px] leading-[0.95] tracking-[-0.03em] text-primary" style={{ textShadow: "0 2px 4px rgba(255,255,255,0.5)" }}>
+            Your footprint leaves a mark. <br className="hidden md:block" /> 
+            Why not leave a <span className="italic" style={{ color: "rgb(107, 203, 119)" }}>garden?</span>
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          {/* Description */}
+          <p className="animate-fade-rise-delayed mt-8 text-aethera-gray text-lg md:text-xl max-w-2xl font-body leading-relaxed">
+            Sprout transforms everyday decisions into something you can see, nurture, and grow. No guilt. No overwhelming numbers. Just awareness that blooms.
           </p>
+          {/* CTA */}
+          <div className="animate-fade-rise-delayed-2 mt-12">
+            <button 
+              onClick={scrollToApp}
+              className="bg-primary text-on-primary px-14 py-5 rounded-full text-lg font-medium hover:scale-[1.02] transition-transform duration-300 shadow-lg shadow-black/5"
+            >
+              Start Growing
+            </button>
+          </div>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
-    </div>
+      </section>
+    </>
   );
 }
