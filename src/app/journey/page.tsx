@@ -210,9 +210,9 @@ export default function Journey() {
           <div 
             className="max-w-2xl transition-all duration-[1500ms] ease-out origin-bottom"
             style={{
-              transform: `scale(${0.3 + (weeklyState.score / 100) * 0.7})`,
-              filter: `saturate(${0.2 + (weeklyState.score / 100) * 1.3}) brightness(${0.7 + (weeklyState.score / 100) * 0.4}) drop-shadow(0 0 ${Math.round(weeklyState.score / 3)}px rgba(34, 139, 34, ${weeklyState.score / 200}))`,
-              opacity: 0.5 + (weeklyState.score / 100) * 0.5,
+              transform: `scale(${0.3 + (Math.max(0, weeklyState.score) / 100) * 0.7})`,
+              filter: `saturate(${0.2 + (Math.max(0, weeklyState.score) / 100) * 1.3}) brightness(${0.7 + (Math.max(0, weeklyState.score) / 100) * 0.4}) drop-shadow(0 0 ${Math.round(Math.max(0, weeklyState.score) / 3)}px rgba(34, 139, 34, ${Math.max(0, weeklyState.score) / 200}))`,
+              opacity: 0.5 + (Math.max(0, weeklyState.score) / 100) * 0.5,
             }}
           >
             <PlantVisual stage={weeklyState.plantStage} className="w-[320px] h-[320px] md:w-[400px] md:h-[400px] object-contain drop-shadow-2xl" />
@@ -228,7 +228,7 @@ export default function Journey() {
             </div>
             <div className="font-display text-3xl leading-tight mb-2 text-primary capitalize">{weeklyState.plantStage.replace('-', ' ')}</div>
             <div className="w-full h-1 bg-surface-variant rounded-full overflow-hidden">
-              <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${weeklyState.score}%` }}></div>
+              <div className="h-full bg-primary transition-all duration-1000" style={{ width: `${Math.max(0, Math.min(100, weeklyState.score))}%` }}></div>
             </div>
             <p className="font-body text-[14px] text-secondary mt-3 italic">{weeklyState.stageDescription}</p>
           </div>

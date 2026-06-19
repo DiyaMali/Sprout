@@ -50,19 +50,19 @@ describe('logic.ts', () => {
       const activities: LoggedActivity[] = [
         { ...mockActivity, emissionsValue: 4.5 }
       ];
-      expect(computeRollingScore(activities)).toBe(0);
+      expect(computeRollingScore(activities)).toBe(-10);
     });
 
-    it('clamps the score between 0 and 100', () => {
+    it('clamps the score between -100 and 100', () => {
       const manyGood: LoggedActivity[] = Array(12).fill({
         ...mockActivity, emissionsValue: 0
       });
       expect(computeRollingScore(manyGood)).toBe(100);
 
-      const manyBad: LoggedActivity[] = Array(10).fill({
+      const manyBad: LoggedActivity[] = Array(12).fill({
         ...mockActivity, emissionsValue: 5.0
       });
-      expect(computeRollingScore(manyBad)).toBe(0);
+      expect(computeRollingScore(manyBad)).toBe(-100);
     });
   });
 

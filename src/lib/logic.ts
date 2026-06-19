@@ -21,7 +21,7 @@ export function computeRollingScore(activities: LoggedActivity[]): number {
     return sum + points;
   }, 0);
 
-  return Math.max(0, Math.min(100, score));
+  return Math.max(-100, Math.min(100, score));
 }
 
 // Map a 0-100 score to a plant stage with responsive growth thresholds
