@@ -14,7 +14,7 @@ export function computeWeeklyEmissions(activities: LoggedActivity[], now: number
 }
 
 // Compute rolling weekly score (0 to 100) based on action quality (+10 for eco-friendly, -10 for high-impact).
-// Starts at a base score of 50.
+// Starts at a base score of 0.
 export function computeRollingScore(activities: LoggedActivity[], now: number = Date.now()): number {
   const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
   const recentActivities = activities.filter(a => a.timestamp >= sevenDaysAgo && a.timestamp <= now);
@@ -22,17 +22,17 @@ export function computeRollingScore(activities: LoggedActivity[], now: number = 
   const score = recentActivities.reduce((sum, a) => {
     const points = a.emissionsValue <= 1.5 ? 10 : -10;
     return sum + points;
-  }, 50);
+  }, 0);
 
   return Math.max(0, Math.min(100, score));
 }
 
-// Map a 0-100 score to a plant stage
+// Map a 0-100 score to a plant stage with responsive growth thresholds
 export function computePlantStage(score: number): PlantStage {
   if (score < 0 || score > 100) return 'wilted';
-  if (score <= 20) return 'wilted';
-  if (score <= 40) return 'seedling';
-  if (score <= 60) return 'budding';
+  if (score <= 0) return 'wilted';
+  if (score <= 20) return 'seedling';
+  if (score <= 50) return 'budding';
   if (score <= 80) return 'blooming';
   return 'flourishing'; // 81-100
 }

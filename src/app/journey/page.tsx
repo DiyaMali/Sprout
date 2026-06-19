@@ -295,6 +295,24 @@ export default function Journey() {
       </div>
 
       <div className="w-full max-w-2xl px-margin-mobile mt-12 animate-fade-rise-delayed-2">
+        {/* Mobile Metrics Dashboard */}
+        <div className="mb-10 block md:hidden animate-fade-rise">
+          <div className="glass p-5 rounded-2xl border border-primary/5 grid grid-cols-3 gap-4 text-center">
+            <div>
+              <div className="font-body text-[10px] text-secondary uppercase tracking-wider font-semibold mb-1">Eco Score</div>
+              <div className="font-display text-2xl text-primary">{Math.round(weeklyState.score)}/100</div>
+            </div>
+            <div>
+              <div className="font-body text-[10px] text-secondary uppercase tracking-wider font-semibold mb-1">Stage</div>
+              <div className="font-display text-sm text-primary capitalize truncate">{weeklyState.plantStage.replace('-', ' ')}</div>
+            </div>
+            <div>
+              <div className="font-body text-[10px] text-secondary uppercase tracking-wider font-semibold mb-1">Streak</div>
+              <div className="font-display text-2xl text-primary">{weeklyState.streakLength} Days</div>
+            </div>
+          </div>
+        </div>
+
         <h3 className="font-display text-3xl text-primary text-center mb-6">Log an Action</h3>
         <QuickLog onLog={handleLog} />
         

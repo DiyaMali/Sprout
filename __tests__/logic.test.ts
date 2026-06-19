@@ -35,26 +35,26 @@ describe('logic.ts', () => {
   });
 
   describe('computeRollingScore', () => {
-    it('returns 50 for no activities', () => {
-      expect(computeRollingScore([])).toBe(50);
+    it('returns 0 for no activities', () => {
+      expect(computeRollingScore([])).toBe(0);
     });
 
     it('adds 10 points for good actions (emissions <= 1.5)', () => {
       const activities: LoggedActivity[] = [
         { ...mockActivity, emissionsValue: 1.0 }
       ];
-      expect(computeRollingScore(activities)).toBe(60);
+      expect(computeRollingScore(activities)).toBe(10);
     });
 
     it('subtracts 10 points for bad actions (emissions > 1.5)', () => {
       const activities: LoggedActivity[] = [
         { ...mockActivity, emissionsValue: 4.5 }
       ];
-      expect(computeRollingScore(activities)).toBe(40);
+      expect(computeRollingScore(activities)).toBe(0);
     });
 
     it('clamps the score between 0 and 100', () => {
-      const manyGood: LoggedActivity[] = Array(10).fill({
+      const manyGood: LoggedActivity[] = Array(12).fill({
         ...mockActivity, emissionsValue: 0
       });
       expect(computeRollingScore(manyGood)).toBe(100);
@@ -67,31 +67,30 @@ describe('logic.ts', () => {
   });
 
   describe('computePlantStage', () => {
-    it('returns wilted for score <= 20', () => {
+    it('returns wilted for score <= 0', () => {
       expect(computePlantStage(0)).toBe('wilted');
-      expect(computePlantStage(20)).toBe('wilted');
       expect(computePlantStage(-10)).toBe('wilted');
+      expect(computePlantStage(110)).toBe('wilted'); // Edge case fallback
     });
 
-    it('returns seedling for score 21-40', () => {
-      expect(computePlantStage(21)).toBe('seedling');
-      expect(computePlantStage(40)).toBe('seedling');
+    it('returns seedling for score 1-20', () => {
+      expect(computePlantStage(1)).toBe('seedling');
+      expect(computePlantStage(20)).toBe('seedling');
     });
 
-    it('returns budding for score 41-60', () => {
-      expect(computePlantStage(41)).toBe('budding');
-      expect(computePlantStage(60)).toBe('budding');
+    it('returns budding for score 21-50', () => {
+      expect(computePlantStage(21)).toBe('budding');
+      expect(computePlantStage(50)).toBe('budding');
     });
 
-    it('returns blooming for score 61-80', () => {
-      expect(computePlantStage(61)).toBe('blooming');
+    it('returns blooming for score 51-80', () => {
+      expect(computePlantStage(51)).toBe('blooming');
       expect(computePlantStage(80)).toBe('blooming');
     });
 
     it('returns flourishing for score 81-100', () => {
       expect(computePlantStage(81)).toBe('flourishing');
       expect(computePlantStage(100)).toBe('flourishing');
-      expect(computePlantStage(110)).toBe('wilted'); // Edge case fallback
     });
   });
 
