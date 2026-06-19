@@ -35,22 +35,34 @@ describe('logic.ts', () => {
   });
 
   describe('computeRollingScore', () => {
-    it('returns 100 for 0 emissions', () => {
-      expect(computeRollingScore(0)).toBe(100);
+    it('returns 50 for no activities', () => {
+      expect(computeRollingScore([])).toBe(50);
     });
 
-    it('returns 100 for negative emissions (edge case)', () => {
-      expect(computeRollingScore(-5)).toBe(100);
+    it('adds 10 points for good actions (emissions <= 1.5)', () => {
+      const activities: LoggedActivity[] = [
+        { ...mockActivity, emissionsValue: 1.0 }
+      ];
+      expect(computeRollingScore(activities)).toBe(60);
     });
 
-    it('returns 0 for >= 50 emissions', () => {
-      expect(computeRollingScore(50)).toBe(0);
-      expect(computeRollingScore(100)).toBe(0);
+    it('subtracts 10 points for bad actions (emissions > 1.5)', () => {
+      const activities: LoggedActivity[] = [
+        { ...mockActivity, emissionsValue: 4.5 }
+      ];
+      expect(computeRollingScore(activities)).toBe(40);
     });
 
-    it('scales linearly between 0 and 50', () => {
-      expect(computeRollingScore(25)).toBe(50);
-      expect(computeRollingScore(10)).toBe(80);
+    it('clamps the score between 0 and 100', () => {
+      const manyGood: LoggedActivity[] = Array(10).fill({
+        ...mockActivity, emissionsValue: 0
+      });
+      expect(computeRollingScore(manyGood)).toBe(100);
+
+      const manyBad: LoggedActivity[] = Array(10).fill({
+        ...mockActivity, emissionsValue: 5.0
+      });
+      expect(computeRollingScore(manyBad)).toBe(0);
     });
   });
 

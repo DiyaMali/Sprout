@@ -35,7 +35,7 @@ export default function Journey() {
   const prevScoreRef = useRef(0);
   const weeklyState = useMemo(() => {
     const totalEmissions = computeWeeklyEmissions(state.activities);
-    const score = computeRollingScore(totalEmissions);
+    const score = computeRollingScore(state.activities);
     const plantStage = computePlantStage(score);
     const stageDescription = getPlantStageDescription(plantStage, state.activities.length);
     const streakLength = computeStreaks(state.activities);

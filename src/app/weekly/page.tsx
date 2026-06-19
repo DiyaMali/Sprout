@@ -24,7 +24,7 @@ export default function WeeklyCardPage() {
 
   const weeklyState = useMemo(() => {
     const totalEmissions = computeWeeklyEmissions(state.activities);
-    const score = computeRollingScore(totalEmissions);
+    const score = computeRollingScore(state.activities);
     const plantStage = computePlantStage(score);
     const streakLength = computeStreaks(state.activities);
     return { totalEmissions, score, plantStage, streakLength };

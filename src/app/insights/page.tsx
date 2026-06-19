@@ -22,7 +22,7 @@ export default function Insights() {
   const [loading, setLoading] = useState(true);
 
   const weeklyEmissions = useMemo(() => computeWeeklyEmissions(state.activities), [state.activities]);
-  const score = useMemo(() => computeRollingScore(weeklyEmissions), [weeklyEmissions]);
+  const score = useMemo(() => computeRollingScore(state.activities), [state.activities]);
 
   // Group emissions by category
   const categoryData = useMemo(() => {

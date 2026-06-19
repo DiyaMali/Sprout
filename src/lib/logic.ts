@@ -13,10 +13,18 @@ export function computeWeeklyEmissions(activities: LoggedActivity[], now: number
     .reduce((total, a) => total + a.emissionsValue, 0);
 }
 
-// Compute daily score (0 to 100) based on emissions.
-// Score scales linearly between 0 and 50 emissions (where 0 emissions = 100 score, >= 50 emissions = 0 score).
-export function computeRollingScore(totalEmissions: number): number {
-  return Math.max(0, Math.min(100, 100 - (totalEmissions * 2)));
+// Compute rolling weekly score (0 to 100) based on action quality (+10 for eco-friendly, -10 for high-impact).
+// Starts at a base score of 50.
+export function computeRollingScore(activities: LoggedActivity[], now: number = Date.now()): number {
+  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
+  const recentActivities = activities.filter(a => a.timestamp >= sevenDaysAgo && a.timestamp <= now);
+
+  const score = recentActivities.reduce((sum, a) => {
+    const points = a.emissionsValue <= 1.5 ? 10 : -10;
+    return sum + points;
+  }, 50);
+
+  return Math.max(0, Math.min(100, score));
 }
 
 // Map a 0-100 score to a plant stage
