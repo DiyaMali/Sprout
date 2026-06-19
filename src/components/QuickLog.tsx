@@ -48,7 +48,7 @@ export function QuickLog({ onLog }: { onLog?: (activity: {categoryId: string, la
       handleLog('shopping', 'custom', data.label || 'Custom Action', data.emissionsValue || 0.5);
       setCustomText('');
       setSelectedCategory('transport');
-    } catch (e) {
+    } catch {
       handleLog('shopping', 'custom', 'Eco Action', 0.5);
     } finally {
       setIsEvaluating(false);

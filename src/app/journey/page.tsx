@@ -8,6 +8,14 @@ import { QuickLog } from '@/components/QuickLog';
 import { PlantVisual } from '@/components/PlantVisual';
 import { Loader2, CheckCircle2, XCircle, Sparkles, AlertTriangle, Trash2, Car, Leaf, Zap, ShoppingBag, PenLine } from 'lucide-react';
 
+interface Feedback {
+  type: 'good' | 'bad';
+  praise?: string;
+  bonusTips?: string[];
+  reality?: string;
+  alternatives?: string[];
+}
+
 export default function Journey() {
   const { state, removeActivity } = useApp();
   const router = useRouter();
@@ -20,15 +28,14 @@ export default function Journey() {
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const plantRef = useRef<HTMLDivElement>(null);
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [feedback, setFeedback] = useState<any>(null);
+  const [feedback, setFeedback] = useState<Feedback | null>(null);
   const [isFetchingFeedback, setIsFetchingFeedback] = useState(false);
   const [loggedAction, setLoggedAction] = useState('');
   const [scoreChange, setScoreChange] = useState<number | null>(null);
   const prevScoreRef = useRef(0);
   const weeklyState = useMemo(() => {
     const totalEmissions = computeWeeklyEmissions(state.activities);
-    const score = computeRollingScore(totalEmissions, state.activities);
+    const score = computeRollingScore(totalEmissions);
     const plantStage = computePlantStage(score);
     const stageDescription = getPlantStageDescription(plantStage, state.activities.length);
     const streakLength = computeStreaks(state.activities);
@@ -75,7 +82,16 @@ export default function Journey() {
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
 
-    let particles: any[] = [];
+    interface Particle {
+      x: number;
+      y: number;
+      size: number;
+      speedX: number;
+      speedY: number;
+      opacity: number;
+    }
+
+    let particles: Particle[] = [];
     let animationFrameId: number;
 
     const init = () => {
@@ -351,7 +367,7 @@ export default function Journey() {
           <div className="flex justify-between items-center mb-6">
             <div className="flex items-center gap-2">
               <span className="text-primary text-[20px] font-bold">🗒</span>
-              <h3 className="font-display text-2xl text-primary">Today's Choices</h3>
+              <h3 className="font-display text-2xl text-primary">Today&apos;s Choices</h3>
             </div>
             <span className="font-body text-xs text-secondary bg-surface-variant px-3 py-1 rounded-full font-semibold">
               {todayActivities.length} {todayActivities.length === 1 ? 'choice' : 'choices'}
@@ -431,8 +447,8 @@ export default function Journey() {
           <div className="aspect-[16/9] w-full glass overflow-hidden flex items-center justify-center p-12 rounded-xl">
             <div className="w-full flex flex-col items-center text-center relative z-10">
               <span className="text-4xl text-primary/20 mb-6">✧</span>
-              <h3 className="font-display text-3xl italic mb-4 text-primary">"The forest is not a collection of trees, but a network of relationships."</h3>
-              <p className="font-body text-secondary max-w-md">Continue your journey to unlock the 'Ancient Grove' habitat and invite new species to your digital biosphere.</p>
+              <h3 className="font-display text-3xl italic mb-4 text-primary">&ldquo;The forest is not a collection of trees, but a network of relationships.&rdquo;</h3>
+              <p className="font-body text-secondary max-w-md">Continue your journey to unlock the &lsquo;Ancient Grove&rsquo; habitat and invite new species to your digital biosphere.</p>
             </div>
             <div className="absolute inset-0 z-0 opacity-[0.03]">
               <div className="w-full h-full bg-cover bg-center" style={{backgroundImage: "url('https://lh3.googleusercontent.com/aida-public/AB6AXuAoATjE1mTmvNIa65TMsdNiSYQ-i0XkOs-xxSf954A50JMUK9cZLwr8iNYcrSZMJp2L36guVUPbXWrMhUH2P62Ul3WbH9i4w3GW7HEvNJmTz7Hcabf0YQzPmuFGQb_UvmGdvbpdsDt66t5gE1znDHflSR6qkYRXBapEDk_Nff0VuKCLmrH4rMClJKlWOnUD_bE601j0YMIvAZsbRmG4FOsVFtse76R9MKEFZlR1imUOokSEDgbyGoXXuX9Y0ym0yW9ggiLiLvbUV2M')"}}></div>

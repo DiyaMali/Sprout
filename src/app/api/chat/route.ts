@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     `;
 
     // Map message roles: user -> user, assistant -> model
-    const formattedContents = messages.map((m: any) => ({
+    const formattedContents = messages.map((m: { role: string; content: string }) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }]
     }));

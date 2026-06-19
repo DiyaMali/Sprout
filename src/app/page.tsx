@@ -33,7 +33,7 @@ export default function Home() {
       video.play().catch(e => console.log('Autoplay blocked', e));
     };
 
-    video.play().catch(e => console.log('Autoplay blocked, waiting for interaction'));
+    video.play().catch(() => console.log('Autoplay blocked, waiting for interaction'));
     
     video.addEventListener('playing', handlePlaying);
     video.addEventListener('timeupdate', handleTimeUpdate);

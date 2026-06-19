@@ -10,7 +10,9 @@ export function WeeklyCard({ state }: { state: WeeklyState }) {
   const [canShare, setCanShare] = useState(false);
 
   useEffect(() => {
-    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+    setTimeout(() => {
+      setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
+    }, 0);
     const canvas = canvasRef.current;
     if (!canvas) return;
 

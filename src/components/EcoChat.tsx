@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from 'react';
 import { useApp } from '@/lib/storage';
 import { motion, AnimatePresence } from 'framer-motion';
-import { MessageCircle, X, Send, Loader2, Compass } from 'lucide-react';
+import { MessageCircle, X, Send, Loader2 } from 'lucide-react';
 
 interface ChatMessage {
   id: string;
@@ -63,7 +63,7 @@ export function EcoChat() {
         role: 'assistant',
         content: data.content
       }]);
-    } catch (e) {
+    } catch {
       setMessages(prev => [...prev, {
         id: crypto.randomUUID(),
         role: 'assistant',

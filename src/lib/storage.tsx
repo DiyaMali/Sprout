@@ -30,15 +30,20 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   // Load from local storage on mount
   useEffect(() => {
-    setIsMounted(true);
     try {
       const stored = localStorage.getItem(STORAGE_KEY);
       if (stored) {
-        setState(JSON.parse(stored));
+        const parsed = JSON.parse(stored);
+        setTimeout(() => {
+          setState(parsed);
+        }, 0);
       }
     } catch (e) {
       console.error('Failed to load state from local storage', e);
     }
+    setTimeout(() => {
+      setIsMounted(true);
+    }, 0);
   }, []);
 
   // Save to local storage whenever state changes (if mounted)

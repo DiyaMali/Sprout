@@ -58,7 +58,14 @@ export default function Login() {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
-    let particles: any[] = [];
+    interface Particle {
+      x: number;
+      y: number;
+      size: number;
+      speedY: number;
+      opacity: number;
+    }
+    let particles: Particle[] = [];
     const init = () => {
       particles = [];
       for (let i = 0; i < 40; i++) {

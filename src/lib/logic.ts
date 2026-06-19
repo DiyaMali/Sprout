@@ -13,37 +13,15 @@ export function computeWeeklyEmissions(activities: LoggedActivity[], now: number
     .reduce((total, a) => total + a.emissionsValue, 0);
 }
 
-// Each action earns points based on how eco-friendly it is.
-// User requested: +10 for good actions, -10 for bad actions.
-function computeActionPoints(emissionsValue: number): number {
-  // Threshold: 1.5kg is "good". Below or equal = good (+10), above = bad (-10).
-  if (emissionsValue <= 1.5) return 10;
-  return -10;
-}
-
-// Compute daily score (0 to 100) based on action quality.
-// Starts at 0 every day. 
-// Score is the cumulative sum of action points today, clamped to 0-100.
-export function computeRollingScore(totalEmissions: number, activities?: LoggedActivity[], now?: number): number {
-  if (!activities || activities.length === 0) return 0;
-
-  const todayStart = new Date(now || Date.now());
-  todayStart.setHours(0, 0, 0, 0);
-
-  const dailyActivities = activities.filter(a => a.timestamp >= todayStart.getTime() && a.timestamp <= (now || Date.now()));
-
-  if (dailyActivities.length === 0) return 0;
-
-  // Simple cumulative sum of today's actions
-  const totalPoints = dailyActivities.reduce((sum, a) => sum + computeActionPoints(a.emissionsValue), 0);
-  
-  // Clamp between 0 (smallest plant) and 100 (largest plant)
-  return Math.max(0, Math.min(100, totalPoints));
+// Compute daily score (0 to 100) based on emissions.
+// Score scales linearly between 0 and 50 emissions (where 0 emissions = 100 score, >= 50 emissions = 0 score).
+export function computeRollingScore(totalEmissions: number): number {
+  return Math.max(0, Math.min(100, 100 - (totalEmissions * 2)));
 }
 
 // Map a 0-100 score to a plant stage
 export function computePlantStage(score: number): PlantStage {
-  if (score <= 0) return 'wilted';
+  if (score < 0 || score > 100) return 'wilted';
   if (score <= 20) return 'wilted';
   if (score <= 40) return 'seedling';
   if (score <= 60) return 'budding';

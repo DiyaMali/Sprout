@@ -4,7 +4,7 @@ import { useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/storage';
 import { PlantVisual } from '@/components/PlantVisual';
-import { Trash2, Calendar, Award, Sparkles } from 'lucide-react';
+import { Trash2 } from 'lucide-react';
 
 export default function GardenGallery() {
   const { state, deleteSavedCard } = useApp();
@@ -43,7 +43,7 @@ export default function GardenGallery() {
           <div>
             <h3 className="font-display text-2xl text-primary mb-2">Shelf is Empty</h3>
             <p className="font-body text-secondary text-sm leading-relaxed">
-              No weekly cards have been saved to your gallery yet. Visit the Weekly Card page at the end of your week, configure your styles, and click "Save to Gallery"!
+              No weekly cards have been saved to your gallery yet. Visit the Weekly Card page at the end of your week, configure your styles, and click &ldquo;Save to Gallery&rdquo;!
             </p>
           </div>
           <button 

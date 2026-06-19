@@ -5,7 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useApp } from '@/lib/storage';
 import { InsightResponse } from '@/lib/types';
 import { computeWeeklyEmissions, computeRollingScore } from '@/lib/logic';
-import { Car, Leaf, Zap, ShoppingBag, Award, Activity, AlertCircle, Sparkles, TrendingUp } from 'lucide-react';
+import { Car, Leaf, Zap, ShoppingBag, Award } from 'lucide-react';
 
 export default function Insights() {
   const { state } = useApp();
@@ -22,7 +22,7 @@ export default function Insights() {
   const [loading, setLoading] = useState(true);
 
   const weeklyEmissions = useMemo(() => computeWeeklyEmissions(state.activities), [state.activities]);
-  const score = useMemo(() => computeRollingScore(weeklyEmissions, state.activities), [weeklyEmissions, state.activities]);
+  const score = useMemo(() => computeRollingScore(weeklyEmissions), [weeklyEmissions]);
 
   // Group emissions by category
   const categoryData = useMemo(() => {
@@ -150,7 +150,7 @@ export default function Insights() {
         });
         const data = await response.json();
         setInsight(data);
-      } catch (e) {
+      } catch {
         setInsight({
           insight: "The choices you've made are not just ripples, but waves of intent. Your awareness acts as the sunlight that filters through the canopy of your daily routine.",
           suggestion: "Transition your evening routine to a 'Low-Lumen' hour.",
@@ -201,7 +201,7 @@ export default function Insights() {
       }
     }
 
-    let sparkles: Sparkle[] = [];
+    const sparkles: Sparkle[] = [];
     for (let i = 0; i < 40; i++) sparkles.push(new Sparkle());
 
     let animationFrameId: number;
@@ -264,7 +264,7 @@ export default function Insights() {
               </h2>
               <div className="space-y-6 max-w-xl">
                 <p className="font-body text-lg text-on-surface leading-relaxed italic opacity-80">
-                  "{loading ? '...' : insight?.insight}"
+                  &ldquo;{loading ? '...' : insight?.insight}&rdquo;
                 </p>
               </div>
             </div>
@@ -407,7 +407,7 @@ export default function Insights() {
           {/* Quote Card */}
           <div className="py-8 border-t border-black/5">
             <blockquote className="font-display text-3xl italic text-primary leading-tight">
-              "{loading ? '...' : insight?.quote || 'Sustainability is not a destination, but a state of being conscious in every moment.'}"
+              &ldquo;{loading ? '...' : insight?.quote || 'Sustainability is not a destination, but a state of being conscious in every moment.'}&rdquo;
             </blockquote>
           </div>
         </aside>

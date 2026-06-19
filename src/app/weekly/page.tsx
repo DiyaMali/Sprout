@@ -16,7 +16,6 @@ export default function WeeklyCardPage() {
       router.push('/login');
     }
   }, [state.user, router]);
-  const [canShare, setCanShare] = useState(false);
   const [savedToast, setSavedToast] = useState(false);
   const [theme, setTheme] = useState<'ethereal' | 'blueprint'>('ethereal');
   const [showIllustration, setShowIllustration] = useState(true);
@@ -25,15 +24,11 @@ export default function WeeklyCardPage() {
 
   const weeklyState = useMemo(() => {
     const totalEmissions = computeWeeklyEmissions(state.activities);
-    const score = computeRollingScore(totalEmissions, state.activities);
+    const score = computeRollingScore(totalEmissions);
     const plantStage = computePlantStage(score);
     const streakLength = computeStreaks(state.activities);
     return { totalEmissions, score, plantStage, streakLength };
   }, [state.activities]);
-
-  useEffect(() => {
-    setCanShare(typeof navigator !== 'undefined' && typeof navigator.share === 'function');
-  }, []);
 
   const generateCanvasImage = () => {
     const canvas = canvasRef.current;
@@ -83,7 +78,8 @@ export default function WeeklyCardPage() {
 
   const handleShare = async () => {
     const dataUrl = generateCanvasImage();
-    if (!dataUrl || !canShare) {
+    const isShareSupported = typeof navigator !== 'undefined' && typeof navigator.share === 'function';
+    if (!dataUrl || !isShareSupported) {
       handleDownload();
       return;
     }
@@ -137,7 +133,7 @@ export default function WeeklyCardPage() {
       {/* Hero Title Section */}
       <div className="max-w-3xl mb-16">
         <span className="font-body text-xs font-semibold text-secondary uppercase tracking-widest block mb-4">The Reflection</span>
-        <h1 className="font-display text-6xl leading-tight mb-6 text-primary">"This week, my choices helped my garden bloom."</h1>
+        <h1 className="font-display text-6xl leading-tight mb-6 text-primary">&ldquo;This week, my choices helped my garden bloom.&rdquo;</h1>
         <p className="font-body text-lg text-secondary max-w-xl">
           A digital keepsake of your environmental impact and botanical growth. Export your weekly progress as a piece of high-fidelity digital art.
         </p>
