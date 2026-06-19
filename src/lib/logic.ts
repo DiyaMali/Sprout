@@ -13,13 +13,10 @@ export function computeWeeklyEmissions(activities: LoggedActivity[], now: number
     .reduce((total, a) => total + a.emissionsValue, 0);
 }
 
-// Compute rolling weekly score (0 to 100) based on action quality (+10 for eco-friendly, -10 for high-impact).
-// Starts at a base score of 0.
-export function computeRollingScore(activities: LoggedActivity[], now: number = Date.now()): number {
-  const sevenDaysAgo = now - 7 * 24 * 60 * 60 * 1000;
-  const recentActivities = activities.filter(a => a.timestamp >= sevenDaysAgo && a.timestamp <= now);
-
-  const score = recentActivities.reduce((sum, a) => {
+// Compute rolling score (0 to 100) based on action quality (+10 for eco-friendly, -10 for high-impact).
+// Starts at a base score of 0 and accumulates across all logged activities.
+export function computeRollingScore(activities: LoggedActivity[]): number {
+  const score = activities.reduce((sum, a) => {
     const points = a.emissionsValue <= 1.5 ? 10 : -10;
     return sum + points;
   }, 0);
