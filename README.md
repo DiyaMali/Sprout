@@ -89,6 +89,7 @@ sprout/
 └── src/
     ├── app/               # Next.js App Router pages
     │   ├── api/           # Edge runtime API routes
+    │   │   ├── _shared/   # Shared API utilities (geminiClient, validation, fallbacks)
     │   │   ├── chat/      # Eco-coach conversation API
     │   │   ├── evaluate/  # Custom action carbon estimator API
     │   │   ├── feedback/  # Action feedback generator API
@@ -107,7 +108,9 @@ sprout/
     │   ├── PlantVisual.tsx# SVG-based interactive plant states
     │   └── QuickLog.tsx   # Action selection and submission tabs
     └── lib/               # Utility functions & contexts
+        ├── hooks/         # Custom stateful hooks (useInsight, usePlantStage, useChatConversation, useStoredActivities)
         ├── carbonData.ts  # Standard carbon conversion constants
+        ├── constants.ts   # Centralized app constants, thresholds, and limits
         ├── logic.ts       # Plant growth & carbon streak calculators
         ├── storage.tsx    # LocalStorage React context state
         └── types.ts       # Shared TypeScript models
