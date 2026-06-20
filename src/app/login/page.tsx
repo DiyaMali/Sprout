@@ -113,7 +113,7 @@ export default function Login() {
 
     setTimeout(() => {
       const formattedName = isLoginMode 
-        ? email.split('@')[0].charAt(0).toUpperCase() + email.split('@')[0].slice(1) 
+        ? (email.split('@')[0] ?? email).charAt(0).toUpperCase() + (email.split('@')[0] ?? email).slice(1) 
         : name;
       
       const mockAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(formattedName)}`;

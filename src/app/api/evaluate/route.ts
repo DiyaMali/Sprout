@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
@@ -15,9 +16,15 @@ export async function POST(req: Request) {
 
     const ai = new GoogleGenAI({ apiKey });
     
+    // Sanitise: user input is interpolated into a structured JSON prompt.
+    // We strip control characters and limit length to prevent prompt injection.
+    const safeAction = String(customAction ?? '')
+      .replace(/[\x00-\x1F\x7F]/g, '')
+      .slice(0, 500);
+
     const prompt = `
       You are an expert carbon footprint estimator.
-      The user has submitted a custom sustainable action: "${customAction}"
+      The user has submitted a custom sustainable action: "${safeAction}"
       Estimate the approximate kilograms of CO2e (emissionsValue) saved by this action. 
       Also provide a short 1-3 word label for it.
       Return ONLY a valid JSON object in this exact format:

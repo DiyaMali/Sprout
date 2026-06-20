@@ -1,9 +1,40 @@
 "use client";
 
-import { motion, AnimatePresence } from 'framer-motion';
+import React from 'react';
+import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 import { PlantStage } from '@/lib/types';
 
-// Simple SVG representations of the plant stages
+// ─── Accessible stage metadata ───────────────────────────────────────────────
+export const STAGE_LABELS = [
+  'Wilted',
+  'Seedling',
+  'Budding',
+  'Blooming',
+  'Flourishing',
+] as const;
+
+export const STAGE_DESCRIPTIONS = [
+  'Your plant needs care — try a green choice today.',
+  'A new beginning — small steps are growing.',
+  'Progress is blooming — keep it up!',
+  "You're thriving — great eco choices this week!",
+  "Flourishing! You're making a real difference.",
+] as const;
+
+const STAGE_ORDER: PlantStage[] = [
+  'wilted',
+  'seedling',
+  'budding',
+  'blooming',
+  'flourishing',
+];
+
+function getStageIndex(stage: PlantStage): number {
+  const idx = STAGE_ORDER.indexOf(stage);
+  return idx;
+}
+
+// ─── SVG representations ─────────────────────────────────────────────────────
 const STAGES_SVG: Record<PlantStage, React.ReactNode> = {
   wilted: (
     <svg viewBox="0 0 100 100" className="w-full h-full text-aethera-gray">
@@ -51,21 +82,50 @@ const STAGES_SVG: Record<PlantStage, React.ReactNode> = {
   ),
 };
 
-export function PlantVisual({ stage, className = "w-64 h-64" }: { stage: PlantStage; className?: string }) {
+// ─── Component ────────────────────────────────────────────────────────────────
+
+interface PlantVisualProps {
+  stage: PlantStage;
+  className?: string;
+}
+
+export const PlantVisual = React.memo(function PlantVisual({
+  stage,
+  className = 'w-64 h-64',
+}: PlantVisualProps) {
+  const prefersReduced = useReducedMotion();
+  const stageIndex = getStageIndex(stage);
+  const stageLabel = STAGE_LABELS[stageIndex] ?? STAGE_LABELS[0];
+  const stageDescription = STAGE_DESCRIPTIONS[stageIndex] ?? STAGE_DESCRIPTIONS[0];
+  const ariaLabel = `Plant stage: ${stageLabel} — ${stageDescription}`;
+
   return (
-    <div className={`relative flex items-center justify-center mx-auto ${className}`}>
+    <div
+      className={`relative flex items-center justify-center mx-auto ${className}`}
+      data-testid="plant-visual"
+    >
       <AnimatePresence mode="wait">
         <motion.div
           key={stage}
+          role="img"
+          aria-label={ariaLabel}
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, y: -20 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} // smooth spring-like feel
+          transition={{ duration: prefersReduced ? 0 : 0.8, ease: [0.16, 1, 0.3, 1] }}
           className="absolute inset-0"
         >
+          {/* Accessible SVG title for screen readers */}
+          <svg
+            viewBox="0 0 0 0"
+            aria-hidden="true"
+            style={{ position: 'absolute', width: 0, height: 0 }}
+          >
+            <title>{`Plant stage: ${stageLabel}`}</title>
+          </svg>
           {STAGES_SVG[stage]}
         </motion.div>
       </AnimatePresence>
     </div>
   );
-}
+});

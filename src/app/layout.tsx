@@ -30,11 +30,19 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${instrumentSerif.variable}`}>
       <body className="bg-surface text-on-surface selection:bg-primary selection:text-white antialiased min-h-screen flex flex-col">
+        {/* Skip link — first element in body for keyboard users */}
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded focus:shadow-lg focus:outline-none"
+        >
+          Skip to main content
+        </a>
+
         <AppProvider>
           {/* TopNavBar */}
           <Navigation />
-          
-          <main className="flex-1 relative flex flex-col pt-[calc(8rem-75px)]">
+
+          <main id="main-content" className="flex-1 relative flex flex-col pt-[calc(8rem-75px)]">
             {children}
           </main>
 

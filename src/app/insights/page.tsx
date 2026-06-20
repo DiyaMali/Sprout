@@ -24,15 +24,20 @@ export default function Insights() {
   const weeklyEmissions = useMemo(() => computeWeeklyEmissions(state.activities), [state.activities]);
   const score = useMemo(() => computeRollingScore(state.activities), [state.activities]);
 
-  // Group emissions by category
   const categoryData = useMemo(() => {
-    const categories: Record<string, number> = { transport: 0, meal: 0, energy: 0, shopping: 0 };
+    const categories = { transport: 0, meal: 0, energy: 0, shopping: 0 } as {
+      transport: number;
+      meal: number;
+      energy: number;
+      shopping: number;
+    };
     let total = 0;
 
     state.activities.forEach(act => {
       const value = act.emissionsValue || 0;
-      if (categories[act.categoryId] !== undefined) {
-        categories[act.categoryId] += value;
+      const key = act.categoryId as keyof typeof categories;
+      if (key in categories) {
+        categories[key] += value;
         total += value;
       }
     });

@@ -2,6 +2,7 @@ import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 // Threshold: actions with emissionsValue <= this are "good"
 const GOOD_THRESHOLD = 1.5;
@@ -9,7 +10,10 @@ const GOOD_THRESHOLD = 1.5;
 export async function POST(req: Request) {
   try {
     const { activity, apiKeyOverride } = await req.json();
-    const isGood = (activity.emissionsValue ?? 0) <= GOOD_THRESHOLD;
+    // Sanitise: user input is interpolated into prompts. Strip control chars and limit length.
+    const safeLabel = String(activity?.label ?? '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 200);
+    const safeCategoryId = String(activity?.categoryId ?? '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 50);
+    const isGood = (activity?.emissionsValue ?? 0) <= GOOD_THRESHOLD;
 
     const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
 
@@ -83,13 +87,13 @@ export async function POST(req: Request) {
     if (isGood) {
       prompt = `
         You are a warm, creative environmental coach.
-        The user just logged a LOW-IMPACT, ECO-FRIENDLY action: "${activity.label}" (category: "${activity.categoryId}", emissions: ${activity.emissionsValue}kg CO2e).
+        The user just logged a LOW-IMPACT, ECO-FRIENDLY action: "${safeLabel}" (category: "${safeCategoryId}", emissions: ${activity?.emissionsValue as number}kg CO2e).
         
         This is a GOOD action. Celebrate it! Then give 2 bonus tips to go even further.
         
         RULES:
-        - The praise should be 1-2 sentences, warm, specific to "${activity.label}", and make the user feel genuinely proud.
-        - The 2 bonus tips should be creative, unconventional, and directly related to "${activity.label}".
+        - The praise should be 1-2 sentences, warm, specific to "${safeLabel}", and make the user feel genuinely proud.
+        - The 2 bonus tips should be creative, unconventional, and directly related to "${safeLabel}".
         - Avoid clichés like "ride a bike" or "turn off lights".
         - Keep each tip under 15 words.
         
@@ -103,13 +107,13 @@ export async function POST(req: Request) {
     } else {
       prompt = `
         You are an honest but compassionate environmental coach.
-        The user just logged a HIGH-IMPACT action: "${activity.label}" (category: "${activity.categoryId}", emissions: ${activity.emissionsValue}kg CO2e).
+        The user just logged a HIGH-IMPACT action: "${safeLabel}" (category: "${safeCategoryId}", emissions: ${activity?.emissionsValue as number}kg CO2e).
         
         This is a BAD action for the environment. Be honest about the impact, then suggest 2 better alternatives.
         
         RULES:
-        - "reality" should be 1-2 sentences explaining the real environmental cost of "${activity.label}" using a vivid, relatable comparison (not shaming, but eye-opening).
-        - The 2 alternatives should be practical, specific swaps directly related to "${activity.label}".
+        - "reality" should be 1-2 sentences explaining the real environmental cost of "${safeLabel}" using a vivid, relatable comparison (not shaming, but eye-opening).
+        - The 2 alternatives should be practical, specific swaps directly related to "${safeLabel}".
         - Avoid clichés. Be creative and actionable.
         - Keep each alternative under 15 words.
         

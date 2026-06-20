@@ -2,19 +2,37 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Sprout Core Flow', () => {
   test('should log an activity, update the UI, and generate insight (fallback)', async ({ page }) => {
-    await page.goto('/');
+    // 1. Setup mock login state
+    await page.goto('/login');
+    await page.evaluate(() => {
+      localStorage.setItem('sprout_app_state', JSON.stringify({
+        activities: [],
+        settings: {},
+        user: { name: 'Test User', email: 'test@example.com', avatar: 'test-avatar' }
+      }));
+    });
 
-    // Check title
-    await expect(page.locator('h1')).toContainText('Your Garden');
+    // 2. Go to journey page
+    await page.goto('/journey');
 
-    // Make sure Weekly card is not present yet
-    await expect(page.locator('text=Your Weekly Snapshot')).toHaveCount(0);
+    // Check title contains "Your Living Garden"
+    await expect(page.locator('h1')).toContainText('Your Living Garden');
 
-    // Log an activity
+    // Make sure no choices are logged today yet
+    await expect(page.locator('text=No choices logged today yet')).toBeVisible();
+
+    // 3. Log an activity
     await page.click('button:has-text("Walked or Biked")');
 
-    // Wait for the Weekly card to appear, which proves the flow completed
-    await expect(page.locator('text=Your Weekly Snapshot')).toBeVisible({ timeout: 10000 });
+    // Wait for the Instant Feedback to appear to confirm the log was processed
+    await expect(page.locator('text=Great Choice!').or(page.locator('text=Consider This'))).toBeVisible({ timeout: 10000 });
+
+    // Verify it is added to today's choices
+    await expect(page.locator('h3:has-text("Walked or Biked")').first()).toBeVisible();
+
+    // 4. Navigate to Weekly Card page to view/export the canvas snapshot
+    await page.goto('/weekly');
+    await expect(page.locator('h1')).toContainText('choices helped my garden bloom');
     await expect(page.locator('canvas')).toHaveCount(1);
   });
 

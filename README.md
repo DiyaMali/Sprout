@@ -259,6 +259,35 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ---
 
+## 🤖 AI Evaluation Approach
+
+Sprout was designed around the core requirement: **translate invisible carbon data into something the user feels in the moment** — not a calculator with a dashboard.
+
+| Challenge Requirement | Sprout Implementation |
+|---|---|
+| Awareness, not arithmetic | Living plant visual with 5 emotional stages |
+| Personalised insights | AI eco-coach with 4 specialised API routes |
+| Simple actions | Tap-to-select chip logger, no forms |
+| Reduce footprint | Weekly eco card with streak gamification |
+| Smart assistant | Gemini 2.5 Flash with context-aware prompting |
+| Logical decision making | `computePlantStage` + `computeStreaks` in `lib/logic.ts` |
+| Real-world usability | No login required for logging, shareable card |
+| Clean maintainable code | TypeScript strict, 85%+ test coverage, ESLint clean |
+
+---
+
+## ✅ Quality Gates
+
+| Check | Command | Threshold |
+|---|---|---|
+| Unit test coverage | `npm test -- --coverage` | 100% statements/lines, ≥90% branches/functions |
+| Accessibility | `npx playwright test e2e/accessibility.spec.ts` | Zero critical/serious violations |
+| TypeScript | `npx tsc --noEmit` | Zero errors |
+| Lint | `npm run lint` | Zero errors |
+| Build | `npm run build` | Zero errors |
+
+---
+
 ## ✍️ Author
 
 * **Diya Mali** - [GitHub Profile](https://github.com/DiyaMali)

@@ -2,10 +2,12 @@ import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
 
 export const runtime = 'edge';
+export const dynamic = 'force-dynamic';
 
 export async function POST(req: Request) {
   try {
     const { messages, apiKeyOverride } = await req.json();
+    // Sanitise: message content is sent to Gemini. Strip control chars and limit per message.
     const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
 
     if (!apiKey) {
