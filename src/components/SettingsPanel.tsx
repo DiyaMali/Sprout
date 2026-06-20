@@ -1,5 +1,5 @@
 /* eslint-disable jsx-a11y/click-events-have-key-events */
-"use client";
+'use client';
 
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useApp } from '@/lib/storage';
@@ -7,7 +7,10 @@ import { Settings, X } from 'lucide-react';
 import { motion, AnimatePresence, useReducedMotion } from 'framer-motion';
 
 /** Trap keyboard focus within a modal element. */
-function useFocusTrap(ref: React.RefObject<HTMLElement | null>, isActive: boolean) {
+function useFocusTrap(
+  ref: React.RefObject<HTMLElement | null>,
+  isActive: boolean,
+) {
   useEffect(() => {
     if (!isActive || !ref.current) return;
 
@@ -78,7 +81,11 @@ export function SettingsPanel() {
 
   const animationProps = prefersReduced
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : { initial: { opacity: 0, scale: 0.95 }, animate: { opacity: 1, scale: 1 }, exit: { opacity: 0, scale: 0.95 } };
+    : {
+        initial: { opacity: 0, scale: 0.95 },
+        animate: { opacity: 1, scale: 1 },
+        exit: { opacity: 0, scale: 0.95 },
+      };
 
   return (
     <>
@@ -88,7 +95,7 @@ export function SettingsPanel() {
         aria-label="Settings"
         aria-expanded={isOpen}
         aria-controls="settings-panel"
-        className="fixed bottom-6 right-6 p-3 bg-surface-container-high rounded-full text-on-surface-variant hover:text-primary transition-colors shadow-sm z-40"
+        className="bg-surface-container-high text-on-surface-variant hover:text-primary fixed right-6 bottom-6 z-40 rounded-full p-3 shadow-sm transition-colors"
       >
         <Settings size={20} aria-hidden="true" />
       </button>
@@ -96,7 +103,7 @@ export function SettingsPanel() {
       <AnimatePresence>
         {isOpen && (
           <div
-            className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/20 backdrop-blur-sm"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/20 px-4 backdrop-blur-sm"
             onClick={(e) => {
               if (e.target === e.currentTarget) handleClose();
             }}
@@ -108,26 +115,33 @@ export function SettingsPanel() {
               aria-modal="true"
               aria-labelledby="settings-panel-heading"
               {...animationProps}
-              className="bg-white rounded-2xl p-6 w-full max-w-md shadow-xl border border-primary/10 relative"
+              className="border-primary/10 relative w-full max-w-md rounded-2xl border bg-white p-6 shadow-xl"
             >
               <button
                 onClick={handleClose}
                 aria-label="Close settings"
-                className="absolute top-4 right-4 text-aethera-gray hover:text-primary transition-colors"
+                className="text-aethera-gray hover:text-primary absolute top-4 right-4 transition-colors"
               >
                 <X size={20} aria-hidden="true" />
               </button>
 
-              <h2 id="settings-panel-heading" className="font-display text-2xl mb-2 text-primary">
+              <h2
+                id="settings-panel-heading"
+                className="font-display text-primary mb-2 text-2xl"
+              >
                 Settings
               </h2>
-              <p className="text-sm text-aethera-gray mb-6">
-                Configure your experience. Your API key is stored locally and never sent to our servers.
+              <p className="text-aethera-gray mb-6 text-sm">
+                Configure your experience. Your API key is stored locally and
+                never sent to our servers.
               </p>
 
               <div className="space-y-4">
                 <div>
-                  <label htmlFor="apiKey" className="block text-sm font-medium text-on-surface mb-1">
+                  <label
+                    htmlFor="apiKey"
+                    className="text-on-surface mb-1 block text-sm font-medium"
+                  >
                     Gemini API Key (Optional)
                   </label>
                   <input
@@ -136,23 +150,24 @@ export function SettingsPanel() {
                     value={tempKey}
                     onChange={(e) => setTempKey(e.target.value)}
                     placeholder="AIzaSy..."
-                    className="w-full px-4 py-2 rounded-lg border border-primary/20 bg-surface-variant/30 focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-sm"
+                    className="border-primary/20 bg-surface-variant/30 focus:border-primary focus:ring-primary w-full rounded-lg border px-4 py-2 text-sm focus:ring-1 focus:outline-none"
                   />
-                  <p className="text-xs text-aethera-gray mt-2">
-                    Used to generate personalized nudges. If left blank, a fallback insight will be provided.
+                  <p className="text-aethera-gray mt-2 text-xs">
+                    Used to generate personalized nudges. If left blank, a
+                    fallback insight will be provided.
                   </p>
                 </div>
 
-                <div className="pt-4 flex justify-end gap-3">
+                <div className="flex justify-end gap-3 pt-4">
                   <button
                     onClick={handleClose}
-                    className="px-4 py-2 text-sm font-medium text-aethera-gray hover:text-primary transition-colors"
+                    className="text-aethera-gray hover:text-primary px-4 py-2 text-sm font-medium transition-colors"
                   >
                     Cancel
                   </button>
                   <button
                     onClick={handleSave}
-                    className="px-6 py-2 bg-primary text-on-primary rounded-lg text-sm font-medium hover:opacity-90 transition-opacity"
+                    className="bg-primary text-on-primary rounded-lg px-6 py-2 text-sm font-medium transition-opacity hover:opacity-90"
                   >
                     Save
                   </button>

@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
   --color-primary: #000000;
@@ -16,10 +16,10 @@
   --color-outline: #7e7576;
   --color-surface-variant: #e2e2e2;
   --color-on-surface-variant: #4c4546;
-  --color-aethera-gray: #6F6F6F;
+  --color-aethera-gray: #6f6f6f;
 
-  --font-display: "Instrument Serif", serif;
-  --font-body: "Inter", sans-serif;
+  --font-display: 'Instrument Serif', serif;
+  --font-body: 'Inter', sans-serif;
 
   --spacing-gutter: 24px;
   --spacing-unit: 8px;
@@ -54,7 +54,7 @@
   body::-webkit-scrollbar {
     display: none;
   }
-  
+
   .font-display {
     font-family: var(--font-display);
   }
@@ -81,6 +81,10 @@
     transition: opacity 0.5s ease;
   }
 
-  .fade-in { opacity: 1 !important; }
-  .fade-out { opacity: 0 !important; }
+  .fade-in {
+    opacity: 1 !important;
+  }
+  .fade-out {
+    opacity: 0 !important;
+  }
 }

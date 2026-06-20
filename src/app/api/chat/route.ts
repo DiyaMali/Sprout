@@ -1,5 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { getGeminiClient } from '../_shared/geminiClient';
+import { FALLBACKS } from '../_shared/fallbacks';
+import { sanitizeInput } from '../_shared/validation';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -7,25 +9,11 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { messages, apiKeyOverride } = await req.json();
-    // Sanitise: message content is sent to Gemini. Strip control chars and limit per message.
-    const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
+    const ai = getGeminiClient(apiKeyOverride);
 
-    if (!apiKey) {
-      // Poetic offline reflections based on category
-      const reflections = [
-        "In the quiet of our routines, we find our highest agency. Swapping one drive for public transit can prevent roughly 4.5kg of carbon emissions.",
-        "A plant-powered plate is a landscape of healing. Opting for a plant-based meal today helps conserve soil health and clear the skies.",
-        "Unplugging a device silences the phantom currents that run unseen through our walls. Small awarenesses form deep roots over time.",
-        "Choosing secondhand extends the lifecycle of our shared artifacts. It is an act of preservation, utility, and refined taste."
-      ];
-      const randomReflection = reflections[Math.floor(Math.random() * reflections.length)];
-      return NextResponse.json({
-        role: "assistant",
-        content: `I am currently in offline mode, but here is a reflection for you:\n\n*"${randomReflection}"*\n\nTo unlock conversational coaching, please supply your Gemini API Key in the settings panel (gear icon) in the header!`
-      });
+    if (!ai) {
+      return NextResponse.json(FALLBACKS.chatOffline());
     }
-
-    const ai = new GoogleGenAI({ apiKey });
 
     const systemInstruction = `
       You are Sprout AI, a warm, poetic, and highly knowledgeable environmental coach.
@@ -35,11 +23,13 @@ export async function POST(req: Request) {
       Do not repeat clichés. Avoid generic introductory text. Be encouraging, thoughtful, and direct.
     `;
 
-    // Map message roles: user -> user, assistant -> model
-    const formattedContents = messages.map((m: { role: string; content: string }) => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
+    // Map message roles: user -> user, assistant -> model, and sanitize content
+    const formattedContents = messages.map(
+      (m: { role: string; content: string }) => ({
+        role: m.role === 'assistant' ? 'model' : 'user',
+        parts: [{ text: sanitizeInput(m.content, 1000) }],
+      }),
+    );
 
     const response = await ai.models.generateContent({
       model: 'gemini-2.5-flash',
@@ -47,18 +37,17 @@ export async function POST(req: Request) {
       config: {
         systemInstruction,
         temperature: 0.8,
-      }
+      },
     });
 
     return NextResponse.json({
-      role: "assistant",
-      content: response.text || "I was unable to formulate a response. Let us focus on nurturing simple eco choices today."
+      role: 'assistant',
+      content:
+        response.text ||
+        'I was unable to formulate a response. Let us focus on nurturing simple eco choices today.',
     });
   } catch (error) {
     console.error('Chat API error:', error);
-    return NextResponse.json({
-      role: "assistant",
-      content: "I hit a small snag. Let's focus on simple habits today while I get back on my feet!"
-    });
+    return NextResponse.json(FALLBACKS.chatError());
   }
 }

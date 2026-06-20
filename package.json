@@ -11,7 +11,9 @@
     "start": "next start",
     "lint": "eslint",
     "test": "jest",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "format": "prettier --write \"src/**/*.{ts,tsx,css}\"",
+    "format:check": "prettier --check \"src/**/*.{ts,tsx,css}\""
   },
   "dependencies": {
     "@google/genai": "^2.8.0",
@@ -39,6 +41,8 @@
     "eslint-plugin-react-hooks": "^7.1.1",
     "jest": "^30.4.2",
     "jest-environment-jsdom": "^30.4.1",
+    "prettier": "^3.8.4",
+    "prettier-plugin-tailwindcss": "^0.8.0",
     "tailwindcss": "^4",
     "typescript": "^5"
   }

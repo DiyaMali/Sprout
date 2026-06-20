@@ -1,5 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { getGeminiClient } from '../_shared/geminiClient';
+import { FALLBACKS } from '../_shared/fallbacks';
+import { sanitizeInput } from '../_shared/validation';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -7,20 +9,16 @@ export const dynamic = 'force-dynamic';
 export async function POST(req: Request) {
   try {
     const { customAction, apiKeyOverride } = await req.json();
+    const ai = getGeminiClient(apiKeyOverride);
 
-    const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
-
-    if (!apiKey) {
-      return NextResponse.json({ error: 'API key not configured' }, { status: 401 });
+    if (!ai) {
+      return NextResponse.json(
+        { error: 'API key not configured' },
+        { status: 401 },
+      );
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-    
-    // Sanitise: user input is interpolated into a structured JSON prompt.
-    // We strip control characters and limit length to prevent prompt injection.
-    const safeAction = String(customAction ?? '')
-      .replace(/[\x00-\x1F\x7F]/g, '')
-      .slice(0, 500);
+    const safeAction = sanitizeInput(customAction, 500);
 
     const prompt = `
       You are an expert carbon footprint estimator.
@@ -39,20 +37,19 @@ export async function POST(req: Request) {
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        responseMimeType: "application/json",
-      }
+        responseMimeType: 'application/json',
+      },
     });
 
     const text = response.text;
     if (!text) {
-        throw new Error("No text returned from Gemini");
+      throw new Error('No text returned from Gemini');
     }
     const result = JSON.parse(text);
 
     return NextResponse.json(result);
   } catch (error) {
     console.error('Evaluate API error:', error);
-    // Fallback if AI fails
-    return NextResponse.json({ label: 'Eco Action', emissionsValue: 0.5 });
+    return NextResponse.json(FALLBACKS.evaluateError());
   }
 }

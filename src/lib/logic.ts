@@ -1,45 +1,39 @@
 import { LoggedActivity, PlantStage } from './types';
+import {
+  ECO_FRIENDLY_THRESHOLD,
+  POINTS_PER_BAD_ACTION,
+  POINTS_PER_GOOD_ACTION,
+  ROLLING_WINDOW_DAYS,
+  SCORE_MAX,
+  SCORE_MIN,
+  STAGE_NAMES,
+  STAGE_THRESHOLDS,
+  MS_IN_DAY,
+} from './constants';
 
-// ─── Named constants (single source of truth) ───────────────────────────────
-/** Emissions threshold (kg CO2e) below which an action is considered eco-friendly */
-export const ECO_FRIENDLY_THRESHOLD = 1.5;
-
-/** Rolling score is clamped to [-100, 100] */
-export const SCORE_MIN = -100;
-export const SCORE_MAX = 100;
-
-/** Points awarded/deducted per logged action */
-export const POINTS_PER_GOOD_ACTION = 10;
-export const POINTS_PER_BAD_ACTION = -10;
-
-/**
- * Stage thresholds (inclusive lower bounds, ascending).
- * Index 0 → wilted, 1 → seedling, 2 → budding, 3 → blooming, 4 → flourishing.
- * This is the single source of truth used by both the logic and the test suite.
- */
-export const STAGE_THRESHOLDS = [0, 1, 21, 51, 81] as const;
-
-/** Stage names in the same order as STAGE_THRESHOLDS */
-export const STAGE_NAMES: PlantStage[] = [
-  'wilted',
-  'seedling',
-  'budding',
-  'blooming',
-  'flourishing',
-];
-
-/** How many days back "weekly" emissions covers */
-export const ROLLING_WINDOW_DAYS = 7;
-
-/** Streak is only counted if today or yesterday has a log */
-export const STREAK_GRACE_DAYS = 1;
+export {
+  ECO_FRIENDLY_THRESHOLD,
+  POINTS_PER_BAD_ACTION,
+  POINTS_PER_GOOD_ACTION,
+  ROLLING_WINDOW_DAYS,
+  SCORE_MAX,
+  SCORE_MIN,
+  STAGE_NAMES,
+  STAGE_THRESHOLDS,
+  MS_IN_DAY,
+};
 
 // ─── Helpers ─────────────────────────────────────────────────────────────────
 
-/** Returns a YYYY-MM-DD string for the given timestamp (local time) */
+/**
+ * Returns a YYYY-MM-DD string for the given timestamp (local time).
+ *
+ * @param timestamp - The epoch milliseconds time.
+ * @returns A formatted string YYYY-MM-DD.
+ */
 function toDateString(timestamp: number): string {
-  const d = new Date(timestamp);
-  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+  const date = new Date(timestamp);
+  return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
 }
 
 // ─── Public API ───────────────────────────────────────────────────────────────
@@ -47,6 +41,9 @@ function toDateString(timestamp: number): string {
 /**
  * Returns the emissions value for a single logged activity.
  * Always returns a non-negative number.
+ *
+ * @param activity - The logged activity selection.
+ * @returns The non-negative emission value in kg CO2e.
  */
 export function computeEmissions(activity: LoggedActivity): number {
   return Math.max(0, activity.emissionsValue);
@@ -55,12 +52,16 @@ export function computeEmissions(activity: LoggedActivity): number {
 /**
  * Sums emissions for activities within the last ROLLING_WINDOW_DAYS days.
  * O(n) — single filter+reduce pass.
+ *
+ * @param activities - Logged activities array history.
+ * @param now - Current reference timestamp in epoch milliseconds.
+ * @returns Total carbon emissions sum.
  */
 export function computeWeeklyEmissions(
   activities: LoggedActivity[],
   now: number = Date.now(),
 ): number {
-  const windowStart = now - ROLLING_WINDOW_DAYS * 24 * 60 * 60 * 1000;
+  const windowStart = now - ROLLING_WINDOW_DAYS * MS_IN_DAY;
   return activities
     .filter((a) => a.timestamp >= windowStart && a.timestamp <= now)
     .reduce((total, a) => total + a.emissionsValue, 0);
@@ -70,6 +71,9 @@ export function computeWeeklyEmissions(
  * Rolling score (clamped to [SCORE_MIN, SCORE_MAX]).
  * +POINTS_PER_GOOD_ACTION for eco-friendly actions, POINTS_PER_BAD_ACTION otherwise.
  * O(n) — single reduce pass.
+ *
+ * @param activities - Logged activities array history.
+ * @returns The overall calculated weekly score clamped between -100 and 100.
  */
 export function computeRollingScore(activities: LoggedActivity[]): number {
   const raw = activities.reduce((sum, a) => {
@@ -86,6 +90,9 @@ export function computeRollingScore(activities: LoggedActivity[]): number {
  * Maps a numeric score to a PlantStage using STAGE_THRESHOLDS.
  * O(k) where k = number of stages (constant 5).
  * Returns 'wilted' for out-of-range scores.
+ *
+ * @param score - A weekly score value between -100 and 100.
+ * @returns Corresponding PlantStage name string.
  */
 export function computePlantStage(score: number): PlantStage {
   if (score < 0 || score > SCORE_MAX) return 'wilted';
@@ -101,7 +108,13 @@ export function computePlantStage(score: number): PlantStage {
   return stage;
 }
 
-/** Returns a human-readable description for the current plant stage. */
+/**
+ * Returns a human-readable description for the current plant stage.
+ *
+ * @param stage - The visual PlantStage name.
+ * @param activityCount - The number of logged activities.
+ * @returns Friendly poetic status text.
+ */
 export function getPlantStageDescription(
   stage: PlantStage,
   activityCount: number,
@@ -128,6 +141,10 @@ export function getPlantStageDescription(
  * O(n) — builds a Set of date strings in one pass, then walks backward from today.
  * Multiple logs on the same day count as 1 day.
  * The streak is preserved if today OR yesterday has a log.
+ *
+ * @param activities - Logged activities array history.
+ * @param now - Current reference timestamp in epoch milliseconds.
+ * @returns Uninterrupted logging streak length.
  */
 export function computeStreaks(
   activities: LoggedActivity[],
@@ -139,7 +156,7 @@ export function computeStreaks(
   const daySet = new Set(activities.map((a) => toDateString(a.timestamp)));
 
   const todayStr = toDateString(now);
-  const yesterday = now - 24 * 60 * 60 * 1000;
+  const yesterday = now - MS_IN_DAY;
   const yesterdayStr = toDateString(yesterday);
 
   // Streak is broken if neither today nor yesterday has a log
@@ -151,7 +168,7 @@ export function computeStreaks(
 
   while (daySet.has(toDateString(cursor))) {
     streak++;
-    cursor -= 24 * 60 * 60 * 1000;
+    cursor -= MS_IN_DAY;
   }
 
   return streak;

@@ -1,86 +1,27 @@
-import { GoogleGenAI } from '@google/genai';
 import { NextResponse } from 'next/server';
+import { getGeminiClient } from '../_shared/geminiClient';
+import { FALLBACKS } from '../_shared/fallbacks';
+import { sanitizeInput } from '../_shared/validation';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
 
-// Threshold: actions with emissionsValue <= this are "good"
 const GOOD_THRESHOLD = 1.5;
 
 export async function POST(req: Request) {
   try {
     const { activity, apiKeyOverride } = await req.json();
-    // Sanitise: user input is interpolated into prompts. Strip control chars and limit length.
-    const safeLabel = String(activity?.label ?? '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 200);
-    const safeCategoryId = String(activity?.categoryId ?? '').replace(/[\x00-\x1F\x7F]/g, '').slice(0, 50);
+    const safeLabel = sanitizeInput(activity?.label, 200);
+    const safeCategoryId = sanitizeInput(activity?.categoryId, 50);
     const isGood = (activity?.emissionsValue ?? 0) <= GOOD_THRESHOLD;
 
-    const apiKey = apiKeyOverride || process.env.GEMINI_API_KEY;
+    const ai = getGeminiClient(apiKeyOverride);
 
-    if (!apiKey) {
-      // Offline fallbacks based on good/bad and category
-      if (isGood) {
-        const goodFallbacks: Record<string, { type: string; praise: string; bonusTips: string[] }> = {
-          transport: {
-            type: 'good',
-            praise: "Incredible choice! You just kept emissions at near-zero for this trip.",
-            bonusTips: ["Map a scenic walking route you haven't tried before.", "Invite a friend to walk with you next time for shared impact."]
-          },
-          meal: {
-            type: 'good',
-            praise: "A plant-powered meal is one of the single highest-impact daily choices you can make.",
-            bonusTips: ["Try growing one herb at home for your next dish.", "Explore a farmer's market this weekend for ultra-local ingredients."]
-          },
-          energy: {
-            type: 'good',
-            praise: "Turning things off is the simplest, most powerful habit. Well done.",
-            bonusTips: ["Use a power strip to kill phantom loads in one click.", "Open curtains for natural light instead of flipping a switch."]
-          },
-          shopping: {
-            type: 'good',
-            praise: "Restraint is a superpower. You just proved the most sustainable product is the one you don't buy.",
-            bonusTips: ["Try a 30-day wishlist rule before any purchase.", "Organize a swap event with friends for things you need."]
-          },
-          custom: {
-            type: 'good',
-            praise: "That's a thoughtful, low-impact choice. Your garden thanks you.",
-            bonusTips: ["Journal this habit to build momentum.", "Share this win with someone to inspire them."]
-          }
-        };
-        return NextResponse.json(goodFallbacks[activity.categoryId] || goodFallbacks.custom);
-      } else {
-        const badFallbacks: Record<string, { type: string; reality: string; alternatives: string[] }> = {
-          transport: {
-            type: 'bad',
-            reality: "Solo driving emits roughly 4.5kg CO2 per trip — that's like charging your phone 540 times.",
-            alternatives: ["Try carpooling with a colleague even once this week.", "Combine multiple errands into a single trip to cut mileage in half."]
-          },
-          meal: {
-            type: 'bad',
-            reality: "Red meat has one of the highest carbon footprints of any single food item.",
-            alternatives: ["Swap beef for chicken in your favourite recipe — it cuts emissions by 60%.", "Try one 'Meatless Monday' this week as an experiment."]
-          },
-          energy: {
-            type: 'bad',
-            reality: "Leaving everything running overnight can waste as much energy as a short road trip.",
-            alternatives: ["Set a nightly phone alarm to do a quick 'power sweep' of your space.", "Use smart plugs to auto-schedule high-draw devices."]
-          },
-          shopping: {
-            type: 'bad',
-            reality: "Fast fashion items are worn an average of just 7 times before being discarded.",
-            alternatives: ["Check if the item exists secondhand before buying new.", "Ask yourself: 'Will I wear this 30 times?' before checkout."]
-          },
-          custom: {
-            type: 'bad',
-            reality: "This action has a higher environmental cost than you might think.",
-            alternatives: ["Research a lower-impact alternative for next time.", "Track this habit to see how small swaps add up over a month."]
-          }
-        };
-        return NextResponse.json(badFallbacks[activity.categoryId] || badFallbacks.custom);
-      }
+    if (!ai) {
+      return NextResponse.json(
+        FALLBACKS.feedbackOffline(safeCategoryId, isGood),
+      );
     }
-
-    const ai = new GoogleGenAI({ apiKey });
 
     let prompt: string;
 
@@ -130,22 +71,18 @@ export async function POST(req: Request) {
       model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
-        responseMimeType: "application/json",
+        responseMimeType: 'application/json',
         temperature: 0.9,
-      }
+      },
     });
 
     const text = response.text;
-    if (!text) throw new Error("No text returned");
+    if (!text) throw new Error('No text returned');
     const result = JSON.parse(text);
 
     return NextResponse.json(result);
   } catch (error) {
     console.error('Feedback API error:', error);
-    return NextResponse.json({
-      type: 'good',
-      praise: "Every conscious choice matters. You're building awareness with each step.",
-      bonusTips: ["Reflect on today's choice before bed.", "Share your journey with someone you care about."]
-    });
+    return NextResponse.json(FALLBACKS.feedbackError());
   }
 }

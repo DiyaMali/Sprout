@@ -1,9 +1,9 @@
-"use client";
+'use client';
 
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { AppState, LoggedActivity, SavedWeeklyCard } from './types';
 
-const STORAGE_KEY = 'sprout_app_state';
+import { STORAGE_KEY } from './constants';
 
 const defaultState: AppState = {
   activities: [],
@@ -53,61 +53,65 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
     }
   }, [state, isMounted]);
 
-  const logActivity = (activityData: Omit<LoggedActivity, 'id' | 'timestamp'>) => {
+  const logActivity = (
+    activityData: Omit<LoggedActivity, 'id' | 'timestamp'>,
+  ) => {
     const newActivity: LoggedActivity = {
       ...activityData,
       id: crypto.randomUUID(),
       timestamp: Date.now(),
     };
-    
-    setState(prev => ({
+
+    setState((prev) => ({
       ...prev,
       activities: [newActivity, ...prev.activities], // prepend new activity
     }));
   };
 
   const removeActivity = (id: string) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      activities: prev.activities.filter(a => a.id !== id),
+      activities: prev.activities.filter((a) => a.id !== id),
     }));
   };
 
   const loginUser = (user: { name: string; email: string; avatar: string }) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       user,
     }));
   };
 
   const logoutUser = () => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       user: null,
     }));
   };
 
-  const saveWeeklyCard = (cardData: Omit<SavedWeeklyCard, 'id' | 'timestamp'>) => {
+  const saveWeeklyCard = (
+    cardData: Omit<SavedWeeklyCard, 'id' | 'timestamp'>,
+  ) => {
     const newCard: SavedWeeklyCard = {
       ...cardData,
       id: crypto.randomUUID(),
       timestamp: Date.now(),
     };
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       savedCards: [newCard, ...(prev.savedCards || [])],
     }));
   };
 
   const deleteSavedCard = (id: string) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
-      savedCards: (prev.savedCards || []).filter(c => c.id !== id),
+      savedCards: (prev.savedCards || []).filter((c) => c.id !== id),
     }));
   };
 
   const updateSettings = (newSettings: Partial<AppState['settings']>) => {
-    setState(prev => ({
+    setState((prev) => ({
       ...prev,
       settings: {
         ...prev.settings,
@@ -123,11 +127,23 @@ export function AppProvider({ children }: { children: React.ReactNode }) {
 
   if (!isMounted) {
     // Avoid hydration mismatch by rendering nothing or a loader until client state is loaded
-    return null; 
+    return null;
   }
 
   return (
-    <AppContext.Provider value={{ state, logActivity, removeActivity, updateSettings, clearData, loginUser, logoutUser, saveWeeklyCard, deleteSavedCard }}>
+    <AppContext.Provider
+      value={{
+        state,
+        logActivity,
+        removeActivity,
+        updateSettings,
+        clearData,
+        loginUser,
+        logoutUser,
+        saveWeeklyCard,
+        deleteSavedCard,
+      }}
+    >
       {children}
     </AppContext.Provider>
   );

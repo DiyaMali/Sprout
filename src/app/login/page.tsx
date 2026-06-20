@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -6,7 +6,7 @@ import { useApp } from '@/lib/storage';
 import { Mail, Lock, User as UserIcon, Sparkles, Loader2 } from 'lucide-react';
 
 const GoogleIcon = () => (
-  <svg className="w-5 h-5 mr-3" viewBox="0 0 24 24">
+  <svg className="mr-3 h-5 w-5" viewBox="0 0 24 24">
     <path
       fill="#4285F4"
       d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -38,7 +38,7 @@ export default function Login() {
   const [googleCustomName, setGoogleCustomName] = useState('');
   const [googleCustomEmail, setGoogleCustomEmail] = useState('');
   const [showGoogleCustomInput, setShowGoogleCustomInput] = useState(false);
-  
+
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
   // If already logged in, redirect to journey
@@ -74,14 +74,14 @@ export default function Login() {
           y: Math.random() * canvas.height,
           size: Math.random() * 1.5 + 0.5,
           speedY: Math.random() * 0.2 + 0.05,
-          opacity: Math.random() * 0.4 + 0.1
+          opacity: Math.random() * 0.4 + 0.1,
         });
       }
     };
 
     const animate = () => {
       ctx.clearRect(0, 0, canvas.width, canvas.height);
-      particles.forEach(p => {
+      particles.forEach((p) => {
         p.y -= p.speedY;
         if (p.y < 0) {
           p.y = canvas.height;
@@ -112,18 +112,19 @@ export default function Login() {
     setLoading(true);
 
     setTimeout(() => {
-      const formattedName = isLoginMode 
-        ? (email.split('@')[0] ?? email).charAt(0).toUpperCase() + (email.split('@')[0] ?? email).slice(1) 
+      const formattedName = isLoginMode
+        ? (email.split('@')[0] ?? email).charAt(0).toUpperCase() +
+          (email.split('@')[0] ?? email).slice(1)
         : name;
-      
+
       const mockAvatar = `https://api.dicebear.com/7.x/bottts/svg?seed=${encodeURIComponent(formattedName)}`;
 
       loginUser({
         name: formattedName,
         email: email,
-        avatar: mockAvatar
+        avatar: mockAvatar,
       });
-      
+
       setLoading(false);
       router.push('/journey');
     }, 1200);
@@ -138,7 +139,7 @@ export default function Login() {
       loginUser({
         name: selectedName,
         email: selectedEmail,
-        avatar: mockAvatar
+        avatar: mockAvatar,
       });
       setLoading(false);
       router.push('/journey');
@@ -146,52 +147,64 @@ export default function Login() {
   };
 
   return (
-    <div className="relative flex-1 flex items-center justify-center pt-24 pb-20 px-margin-mobile md:px-0 min-h-[85vh] overflow-hidden">
-      <canvas ref={canvasRef} className="absolute inset-0 -z-10 pointer-events-none" />
+    <div className="px-margin-mobile relative flex min-h-[85vh] flex-1 items-center justify-center overflow-hidden pt-24 pb-20 md:px-0">
+      <canvas
+        ref={canvasRef}
+        className="pointer-events-none absolute inset-0 -z-10"
+      />
 
       {/* Styled Ambient Glow */}
-      <div className="absolute top-[20%] left-[25%] -translate-x-1/2 w-[500px] h-[500px] bg-green-200/10 rounded-full blur-[120px] pointer-events-none -z-20" />
-      <div className="absolute bottom-[20%] right-[25%] translate-x-1/2 w-[500px] h-[500px] bg-emerald-200/10 rounded-full blur-[120px] pointer-events-none -z-20" />
+      <div className="pointer-events-none absolute top-[20%] left-[25%] -z-20 h-[500px] w-[500px] -translate-x-1/2 rounded-full bg-green-200/10 blur-[120px]" />
+      <div className="pointer-events-none absolute right-[25%] bottom-[20%] -z-20 h-[500px] w-[500px] translate-x-1/2 rounded-full bg-emerald-200/10 blur-[120px]" />
 
       {/* Auth Card */}
-      <div className="w-full max-w-[450px] bg-white/40 backdrop-blur-xl border border-primary/5 rounded-3xl p-8 md:p-10 shadow-xl relative z-10 animate-fade-rise">
-        
+      <div className="border-primary/5 animate-fade-rise relative z-10 w-full max-w-[450px] rounded-3xl border bg-white/40 p-8 shadow-xl backdrop-blur-xl md:p-10">
         {/* Card Header */}
-        <div className="text-center mb-8">
-          <span className="text-3xl mb-3 block">🌱</span>
-          <h1 className="font-display text-4xl text-primary mb-2">Welcome to Sprout</h1>
-          <p className="font-body text-sm text-secondary">Nurture your choices. Watch your garden grow.</p>
+        <div className="mb-8 text-center">
+          <span className="mb-3 block text-3xl">🌱</span>
+          <h1 className="font-display text-primary mb-2 text-4xl">
+            Welcome to Sprout
+          </h1>
+          <p className="font-body text-secondary text-sm">
+            Nurture your choices. Watch your garden grow.
+          </p>
         </div>
 
         {/* Google Authentication Button */}
         <button
           onClick={() => setShowGoogleModal(true)}
-          className="w-full flex items-center justify-center bg-white hover:bg-neutral-50 border border-primary/10 text-primary py-3.5 px-4 rounded-xl font-body text-sm font-semibold shadow-sm transition-all active:scale-[0.98]"
+          className="border-primary/10 text-primary font-body flex w-full items-center justify-center rounded-xl border bg-white px-4 py-3.5 text-sm font-semibold shadow-sm transition-all hover:bg-neutral-50 active:scale-[0.98]"
         >
           <GoogleIcon />
           Continue with Google
         </button>
 
         {/* Divider */}
-        <div className="flex items-center my-6">
-          <div className="flex-grow border-t border-primary/5"></div>
-          <span className="mx-4 text-xs uppercase tracking-widest text-secondary font-body font-bold">or use email</span>
-          <div className="flex-grow border-t border-primary/5"></div>
+        <div className="my-6 flex items-center">
+          <div className="border-primary/5 flex-grow border-t"></div>
+          <span className="text-secondary font-body mx-4 text-xs font-bold tracking-widest uppercase">
+            or use email
+          </span>
+          <div className="border-primary/5 flex-grow border-t"></div>
         </div>
 
         {/* Credentials Form */}
         <form onSubmit={handleEmailAuth} className="space-y-4">
           {!isLoginMode && (
             <div className="space-y-1.5">
-              <label className="block text-xs font-semibold text-primary uppercase tracking-wide font-body">Full Name</label>
+              <label className="text-primary font-body block text-xs font-semibold tracking-wide uppercase">
+                Full Name
+              </label>
               <div className="relative">
-                <span className="absolute left-4 top-3.5 text-secondary"><UserIcon size={18} /></span>
+                <span className="text-secondary absolute top-3.5 left-4">
+                  <UserIcon size={18} />
+                </span>
                 <input
                   type="text"
                   placeholder="Jane Doe"
                   value={name}
-                  onChange={e => setName(e.target.value)}
-                  className="w-full bg-white/60 border border-primary/5 focus:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-sm font-body text-primary outline-none transition-colors"
+                  onChange={(e) => setName(e.target.value)}
+                  className="border-primary/5 focus:border-primary/20 font-body text-primary w-full rounded-xl border bg-white/60 py-3 pr-4 pl-12 text-sm transition-colors outline-none"
                   required
                 />
               </div>
@@ -199,30 +212,38 @@ export default function Login() {
           )}
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-primary uppercase tracking-wide font-body">Email Address</label>
+            <label className="text-primary font-body block text-xs font-semibold tracking-wide uppercase">
+              Email Address
+            </label>
             <div className="relative">
-              <span className="absolute left-4 top-3.5 text-secondary"><Mail size={18} /></span>
+              <span className="text-secondary absolute top-3.5 left-4">
+                <Mail size={18} />
+              </span>
               <input
                 type="email"
                 placeholder="jane.doe@example.com"
                 value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="w-full bg-white/60 border border-primary/5 focus:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-sm font-body text-primary outline-none transition-colors"
+                onChange={(e) => setEmail(e.target.value)}
+                className="border-primary/5 focus:border-primary/20 font-body text-primary w-full rounded-xl border bg-white/60 py-3 pr-4 pl-12 text-sm transition-colors outline-none"
                 required
               />
             </div>
           </div>
 
           <div className="space-y-1.5">
-            <label className="block text-xs font-semibold text-primary uppercase tracking-wide font-body">Password</label>
+            <label className="text-primary font-body block text-xs font-semibold tracking-wide uppercase">
+              Password
+            </label>
             <div className="relative">
-              <span className="absolute left-4 top-3.5 text-secondary"><Lock size={18} /></span>
+              <span className="text-secondary absolute top-3.5 left-4">
+                <Lock size={18} />
+              </span>
               <input
                 type="password"
                 placeholder="••••••••"
                 value={password}
-                onChange={e => setPassword(e.target.value)}
-                className="w-full bg-white/60 border border-primary/5 focus:border-primary/20 rounded-xl py-3 pl-12 pr-4 text-sm font-body text-primary outline-none transition-colors"
+                onChange={(e) => setPassword(e.target.value)}
+                className="border-primary/5 focus:border-primary/20 font-body text-primary w-full rounded-xl border bg-white/60 py-3 pr-4 pl-12 text-sm transition-colors outline-none"
                 required
               />
             </div>
@@ -231,7 +252,7 @@ export default function Login() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full bg-primary text-on-primary py-3.5 rounded-xl font-body text-sm font-bold shadow-md hover:opacity-95 transition-opacity active:scale-[0.99] flex items-center justify-center gap-2 mt-6"
+            className="bg-primary text-on-primary font-body mt-6 flex w-full items-center justify-center gap-2 rounded-xl py-3.5 text-sm font-bold shadow-md transition-opacity hover:opacity-95 active:scale-[0.99]"
           >
             {loading ? (
               <Loader2 size={18} className="animate-spin" />
@@ -245,94 +266,117 @@ export default function Login() {
         </form>
 
         {/* Toggle Mode Option */}
-        <div className="text-center mt-6">
+        <div className="mt-6 text-center">
           <button
             onClick={() => setIsLoginMode(!isLoginMode)}
-            className="font-body text-xs text-secondary hover:text-primary transition-colors underline underline-offset-4 decoration-secondary/30"
+            className="font-body text-secondary hover:text-primary decoration-secondary/30 text-xs underline underline-offset-4 transition-colors"
           >
-            {isLoginMode ? "Don't have an account? Sign up" : "Already have an account? Sign in"}
+            {isLoginMode
+              ? "Don't have an account? Sign up"
+              : 'Already have an account? Sign in'}
           </button>
         </div>
       </div>
 
       {/* Simulated Google Accounts Chooser Popup Modal */}
       {showGoogleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/30 backdrop-blur-sm">
-          <div className="w-full max-w-[380px] bg-white border border-primary/10 rounded-2xl shadow-2xl overflow-hidden animate-fade-rise">
-            
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/30 p-4 backdrop-blur-sm">
+          <div className="border-primary/10 animate-fade-rise w-full max-w-[380px] overflow-hidden rounded-2xl border bg-white shadow-2xl">
             {/* Modal Header */}
-            <div className="p-6 border-b border-primary/5 text-center bg-neutral-50">
-              <div className="flex justify-center mb-3">
+            <div className="border-primary/5 border-b bg-neutral-50 p-6 text-center">
+              <div className="mb-3 flex justify-center">
                 <GoogleIcon />
               </div>
-              <h3 className="font-body text-base font-semibold text-primary">Sign in with Google</h3>
-              <p className="font-body text-xs text-secondary mt-1">to continue to Sprout</p>
+              <h3 className="font-body text-primary text-base font-semibold">
+                Sign in with Google
+              </h3>
+              <p className="font-body text-secondary mt-1 text-xs">
+                to continue to Sprout
+              </p>
             </div>
 
             {/* List of Mock Accounts */}
-            <div className="p-2 space-y-1">
+            <div className="space-y-1 p-2">
               <button
-                onClick={() => handleGoogleLogin('Jane Doe', 'jane.doe@gmail.com')}
-                className="w-full flex items-center p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left"
+                onClick={() =>
+                  handleGoogleLogin('Jane Doe', 'jane.doe@gmail.com')
+                }
+                className="flex w-full items-center rounded-xl p-3 text-left transition-colors hover:bg-neutral-50"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://api.dicebear.com/7.x/adventurer/svg?seed=Jane%20Doe"
                   alt="Jane Doe"
-                  className="w-8 h-8 rounded-full border border-primary/5 bg-neutral-100 mr-3"
+                  className="border-primary/5 mr-3 h-8 w-8 rounded-full border bg-neutral-100"
                 />
                 <div>
-                  <h4 className="font-body text-sm font-semibold text-primary">Jane Doe</h4>
-                  <p className="font-body text-xs text-secondary">jane.doe@gmail.com</p>
+                  <h4 className="font-body text-primary text-sm font-semibold">
+                    Jane Doe
+                  </h4>
+                  <p className="font-body text-secondary text-xs">
+                    jane.doe@gmail.com
+                  </p>
                 </div>
               </button>
 
               <button
-                onClick={() => handleGoogleLogin('Alex Green', 'alex.green@sprout.eco')}
-                className="w-full flex items-center p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left"
+                onClick={() =>
+                  handleGoogleLogin('Alex Green', 'alex.green@sprout.eco')
+                }
+                className="flex w-full items-center rounded-xl p-3 text-left transition-colors hover:bg-neutral-50"
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src="https://api.dicebear.com/7.x/adventurer/svg?seed=Alex%20Green"
                   alt="Alex Green"
-                  className="w-8 h-8 rounded-full border border-primary/5 bg-neutral-100 mr-3"
+                  className="border-primary/5 mr-3 h-8 w-8 rounded-full border bg-neutral-100"
                 />
                 <div>
-                  <h4 className="font-body text-sm font-semibold text-primary">Alex Green</h4>
-                  <p className="font-body text-xs text-secondary">alex.green@sprout.eco</p>
+                  <h4 className="font-body text-primary text-sm font-semibold">
+                    Alex Green
+                  </h4>
+                  <p className="font-body text-secondary text-xs">
+                    alex.green@sprout.eco
+                  </p>
                 </div>
               </button>
 
               {showGoogleCustomInput ? (
-                <div className="p-3 border-t border-primary/5 mt-2 space-y-3">
+                <div className="border-primary/5 mt-2 space-y-3 border-t p-3">
                   <input
                     type="text"
                     placeholder="Full Name"
                     value={googleCustomName}
-                    onChange={e => setGoogleCustomName(e.target.value)}
-                    className="w-full border border-primary/10 rounded-lg px-3 py-2 text-xs font-body outline-none focus:border-primary/30"
+                    onChange={(e) => setGoogleCustomName(e.target.value)}
+                    className="border-primary/10 font-body focus:border-primary/30 w-full rounded-lg border px-3 py-2 text-xs outline-none"
                   />
                   <input
                     type="email"
                     placeholder="custom.user@gmail.com"
                     value={googleCustomEmail}
-                    onChange={e => setGoogleCustomEmail(e.target.value)}
-                    className="w-full border border-primary/10 rounded-lg px-3 py-2 text-xs font-body outline-none focus:border-primary/30"
+                    onChange={(e) => setGoogleCustomEmail(e.target.value)}
+                    className="border-primary/10 font-body focus:border-primary/30 w-full rounded-lg border px-3 py-2 text-xs outline-none"
                   />
-                  <div className="flex gap-2 justify-end">
+                  <div className="flex justify-end gap-2">
                     <button
                       onClick={() => setShowGoogleCustomInput(false)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-body font-semibold hover:bg-neutral-50"
+                      className="font-body rounded-lg px-3 py-1.5 text-xs font-semibold hover:bg-neutral-50"
                     >
                       Cancel
                     </button>
                     <button
                       onClick={() => {
-                        if (googleCustomName.trim() && googleCustomEmail.trim()) {
-                          handleGoogleLogin(googleCustomName, googleCustomEmail);
+                        if (
+                          googleCustomName.trim() &&
+                          googleCustomEmail.trim()
+                        ) {
+                          handleGoogleLogin(
+                            googleCustomName,
+                            googleCustomEmail,
+                          );
                         }
                       }}
-                      className="bg-primary text-on-primary px-3 py-1.5 rounded-lg text-xs font-body font-semibold"
+                      className="bg-primary text-on-primary font-body rounded-lg px-3 py-1.5 text-xs font-semibold"
                     >
                       Log In
                     </button>
@@ -341,22 +385,24 @@ export default function Login() {
               ) : (
                 <button
                   onClick={() => setShowGoogleCustomInput(true)}
-                  className="w-full flex items-center p-3 rounded-xl hover:bg-neutral-50 transition-colors text-left border-t border-primary/5"
+                  className="border-primary/5 flex w-full items-center rounded-xl border-t p-3 text-left transition-colors hover:bg-neutral-50"
                 >
-                  <div className="w-8 h-8 rounded-full bg-neutral-100 border border-primary/5 flex items-center justify-center mr-3 text-secondary text-sm">
+                  <div className="border-primary/5 text-secondary mr-3 flex h-8 w-8 items-center justify-center rounded-full border bg-neutral-100 text-sm">
                     👤
                   </div>
                   <div>
-                    <h4 className="font-body text-sm font-semibold text-secondary">Use another account</h4>
+                    <h4 className="font-body text-secondary text-sm font-semibold">
+                      Use another account
+                    </h4>
                   </div>
                 </button>
               )}
             </div>
 
             {/* Modal Footer */}
-            <div className="p-4 bg-neutral-50 border-t border-primary/5 flex justify-between items-center text-[10px] text-secondary font-body">
+            <div className="border-primary/5 text-secondary font-body flex items-center justify-between border-t bg-neutral-50 p-4 text-[10px]">
               <span>English (United States)</span>
-              <button 
+              <button
                 onClick={() => setShowGoogleModal(false)}
                 className="hover:text-primary font-semibold"
               >

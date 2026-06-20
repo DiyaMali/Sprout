@@ -29,7 +29,10 @@ export class ErrorBoundary extends Component<Props, State> {
     if (this.state.hasError) {
       return (
         this.props.fallback ?? (
-          <div role="alert" className="p-4 text-sm text-amber-800 bg-amber-50 rounded-lg">
+          <div
+            role="alert"
+            className="rounded-lg bg-amber-50 p-4 text-sm text-amber-800"
+          >
             Something went wrong loading this section. Please refresh the page.
           </div>
         )

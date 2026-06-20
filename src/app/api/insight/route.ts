@@ -1,6 +1,8 @@
 import { NextResponse } from 'next/server';
-import { GoogleGenAI } from '@google/genai';
 import { EQUIVALENCIES } from '@/lib/carbonData';
+import { getGeminiClient } from '../_shared/geminiClient';
+import { FALLBACKS } from '../_shared/fallbacks';
+import { sanitizeInput } from '../_shared/validation';
 
 export const runtime = 'edge';
 export const dynamic = 'force-dynamic';
@@ -11,36 +13,27 @@ export async function POST(req: Request) {
     const { activity, weeklyEmissions, score, apiKeyOverride } = body;
 
     if (!activity) {
-      return NextResponse.json({ error: 'Missing activity data' }, { status: 400 });
+      return NextResponse.json(
+        { error: 'Missing activity data' },
+        { status: 400 },
+      );
     }
 
-    const apiKey = (apiKeyOverride as string | undefined) || process.env.GEMINI_API_KEY;
+    const ai = getGeminiClient(apiKeyOverride);
 
-    // Fallback if no API key is available
-    if (!apiKey) {
-      return NextResponse.json({
-        insight: `Every choice adds up. Your recent log of "${activity.label as string}" has a footprint of ${activity.emissionsValue as number}kg CO2e.`,
-        suggestion: 'Consider a lower-impact alternative next time you are in this situation.',
-        title: 'Deepen the Root',
-        quote: 'Sustainability is not a destination, but a state of being conscious in every moment.',
-      });
+    if (!ai) {
+      return NextResponse.json(
+        FALLBACKS.insightOffline(activity.label, activity.emissionsValue),
+      );
     }
 
-    const ai = new GoogleGenAI({ apiKey });
-
-    // Sanitise: user input is interpolated into a structured JSON prompt.
-    // We strip control characters and limit length to prevent prompt injection.
-    const safeLabel = String(activity.label ?? '')
-      .replace(/[\x00-\x1F\x7F]/g, '')
-      .slice(0, 200);
-    const safeCategoryId = String(activity.categoryId ?? '')
-      .replace(/[\x00-\x1F\x7F]/g, '')
-      .slice(0, 50);
+    const safeLabel = sanitizeInput(activity.label, 200);
+    const safeCategoryId = sanitizeInput(activity.categoryId, 50);
 
     // Prepare context using carbon equivalencies
-    const equivalenciesText = EQUIVALENCIES
-      .map((e) => `${e.co2e}kg CO2e is about equivalent to ${e.equivalent}`)
-      .join('. ');
+    const equivalenciesText = EQUIVALENCIES.map(
+      (e) => `${e.co2e}kg CO2e is about equivalent to ${e.equivalent}`,
+    ).join('. ');
 
     const prompt = `
       You are an encouraging, non-shaming environmental awareness AI. 
@@ -86,12 +79,6 @@ export async function POST(req: Request) {
     return NextResponse.json(result);
   } catch (error) {
     console.error('API Route Error:', error);
-    // Graceful fallback on error
-    return NextResponse.json({
-      insight: 'Small steps shape the world. Your activity has been logged successfully.',
-      suggestion: 'Try exploring other low-impact options in this category tomorrow.',
-      title: 'Keep Growing',
-      quote: 'Every leaf that falls nourishes the soil for the next season.',
-    });
+    return NextResponse.json(FALLBACKS.insightError());
   }
 }
